@@ -1,5 +1,3 @@
-import {CandidateWindow} from "./candidateWindow";
-
-window['YngPingCandidateWindow'] = new CandidateWindow();
-
-export default new CandidateWindow();
+import { YngPingWeb } from './yngping';
+console.log("main");
+window['YngPing'] = new YngPingWeb;

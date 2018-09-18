@@ -8,7 +8,10 @@ const modeConfig = env => require(`./build-utils/webpack.${env}`)(env);
 
 module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
   return webpackMerge({
-    entry: './src/index.ts',
+    entry: {
+      "main": './src/index.ts',
+      "worker": "./src/worker/index.ts"
+    },
     mode,
     devtool: 'source-map',
     module: {
@@ -40,15 +43,15 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
       extensions: ['.tsx', '.ts', '.js']
     },
     output: {
-      filename: 'bundle.js',
+      filename: '[name].js',
       sourceMapFilename: '[file].map',
       path: path.resolve(__dirname, 'dist'),
     },
-    optimization: {
+    /*optimization: {
       splitChunks: {
         chunks: 'all'
       }
-    },
+    },*/
     plugins: [
       new CleanWebpackPlugin(['dist'])
     ]

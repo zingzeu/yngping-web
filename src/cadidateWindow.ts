@@ -1,2 +1,0 @@
-import { getCaretCoordinates } from './caretPosition';
-

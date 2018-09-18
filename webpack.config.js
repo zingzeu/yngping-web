@@ -40,7 +40,7 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
       extensions: ['.tsx', '.ts', '.js']
     },
     output: {
-      filename: '[name].js',
+      filename: 'bundle.js',
       sourceMapFilename: '[file].map',
       path: path.resolve(__dirname, 'dist'),
     },

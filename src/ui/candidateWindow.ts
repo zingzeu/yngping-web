@@ -1,7 +1,36 @@
 import { getCaretCoordinates } from './caretPosition';
 import { CandidateWindowState, Composition, Candidate, CandidateWindowStateBuilder } from './candidateWindowState';
+import { IInputManager, InputFocusedEventListener} from './iInputManager';
 
-export class CandidateWindow {
+export class CandidateWindow implements IInputManager {
+
+    private focusedListeners : Array<InputFocusedEventListener> = [];
+    private blurredListeners : Array<InputFocusedEventListener> = [];
+
+    public registerInputFocusedListener(listener: InputFocusedEventListener) {
+        this.focusedListeners.push(listener);
+    }
+    public registerInputBlurredListener(listener: InputFocusedEventListener) {
+        this.blurredListeners.push(listener);
+    }
+
+    public commitText(text: string): boolean {
+        if (this.capturingKeys) {
+            const input = this.activeInputElement as HTMLInputElement;
+            if (input.selectionStart) {
+                var startPos = input.selectionStart;
+                var endPos = input.selectionEnd;
+                input.value = input.value.substring(0, startPos)
+                    + text
+                    + input.value.substring(endPos, input.value.length);
+            } else {
+                input.value += text;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     private element: HTMLDivElement;
     private isActivated : boolean = false;
@@ -10,7 +39,15 @@ export class CandidateWindow {
 
     constructor () {
         this.element = document.createElement("div");
-        this.element.style.cssText = "position: absolute; border: 1px red solid; min-width:100px; z-index:1000; width:100px; min-height: 200px;"
+        this.element.style.cssText = `
+            position: fixed;
+            border: 1px red #efefef;
+            min-width:100px; 
+            z-index:1000; 
+            min-height: 20px;
+            background: #f9f9f9;
+            box-shadow: 0px 3px 9px 3px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
+            padding: 5px;`;
         this.hide();
     }
 
@@ -19,7 +56,6 @@ export class CandidateWindow {
             window.document.body.appendChild(this.element);
             document.addEventListener("focus", this.onFocusEvent, true);
             document.addEventListener("blur", this.onBlurEvent, true);
-            document.addEventListener("keydown", this.onKeyDown, true);
             this.isActivated = true;
         }
     }
@@ -38,26 +74,36 @@ export class CandidateWindow {
         for (let i = 0; i < state.candidateCount; ++i) {
             this.element.appendChild(this.renderCandidate(state.candidates[i], state.isHighlighted(i)));
         }
+        this.show();
         this.updatePosition();
     }
 
     private renderComposition(state: Composition): HTMLElement {
         const div = document.createElement("div");
         div.innerHTML = `${state.text}`;
-        div.style.cssText = 'font-size:12px; overflow: hidden;';
+        div.style.cssText = 'font-size:16px; overflow: hidden;';
         return div;
     }
 
     private renderCandidate(state: Candidate, isHighlighted: boolean = false): HTMLElement {
         const div = document.createElement("div");
-        div.innerHTML = `${state.text} (${state.comment})`;
-        div.style.cssText = 'font-size:12px; overflow: hidden;';
+        const commentText = state.comment && state.comment.length > 0 ? ` (${state.comment})` : '';
+        div.innerHTML = `${state.text}${commentText}`;
+        div.style.cssText = `
+            font-size:16px;
+            overflow: hidden;
+            ${isHighlighted && 'background: #e1eeef;'}
+            border-radius: 2px;
+            padding-left: 2px;`;
         return div;
     }
 
     private onFocusEvent = (e: FocusEvent) =>  {
         let target : HTMLElement = (e.target as HTMLElement);
         if (target.tagName == "TEXTAREA" || target.tagName == "INPUT") {
+            this.focusedListeners.forEach(listener => {
+                listener(target);
+            })
             this.capturingKeys = true;
             this.activeInputElement = target;
             this.show();
@@ -67,6 +113,9 @@ export class CandidateWindow {
 
     private onBlurEvent = (e: FocusEvent) => {
         if (e.type == "blur" && e.target == this.activeInputElement) {
+            this.blurredListeners.forEach(listener => {
+                listener(this.activeInputElement);
+            });
             this.activeInputElement = null;
             this.capturingKeys = false;
             this.hide();
@@ -78,28 +127,17 @@ export class CandidateWindow {
         this.updatePosition();
     }
 
-    private hide() {
+    public hide() {
         this.element.style.display = "none";
     }
 
     private updatePosition() {
         const caret = getCaretCoordinates(this.activeInputElement, (this.activeInputElement as any).selectionEnd, {});
-        this.element.style.top = `${this.activeInputElement.offsetTop + caret.top + caret.height + 20}`;
-        this.element.style.left = `${this.activeInputElement.offsetLeft + caret.left + 50}`;
+        const desiredTop = this.activeInputElement.offsetTop + caret.top + (isNaN(caret.height) ? 0 : caret.height) + 20;
+        const desiredLeft = this.activeInputElement.offsetLeft + caret.left + 50;
+        console.log(desiredTop, desiredLeft);
+        this.element.style.top = `${desiredTop}px`;
+        this.element.style.left = `${desiredLeft}px`;
     }
 
-    private onKeyDown = (e: KeyboardEvent) => {
-        if (this.capturingKeys) {
-            console.log("Suppressing key: ", e.key, e.keyCode, e.metaKey, e.shiftKey);
-            e.preventDefault();
-            console.log(getCaretCoordinates(this.activeInputElement, (this.activeInputElement as any).selectionEnd, {}));
-            this.render(new CandidateWindowStateBuilder()
-                .setComposition(new Composition(e.key,0))
-                .addCandidate(new Candidate("First", "some"))
-                .addCandidate(new Candidate("Second", "some"))
-                .addCandidate(new Candidate("Third", "haha"))
-                .addCandidate(new Candidate("Last", "some"))
-                .build())
-        }
-    }
 }

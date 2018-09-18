@@ -79,6 +79,11 @@ export class CandidateWindowStateBuilder {
         return this;
     }
 
+    public setHighLighted(i: number): CandidateWindowStateBuilder {
+        this.highlightedIndex = i;
+        return this;
+    }
+
     public build(): CandidateWindowState {
         if (this.highlightedIndex == -1) {
             return new CandidateWindowState(this.composition, this.candidates);

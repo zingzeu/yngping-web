@@ -1,9 +1,11 @@
 import {CandidateWindow} from '../ui';
 import { INITIALISED, ERROR, CALLBACK, KEYPRESS } from '../common/messageTypes';
+import { IInputManager } from '../ui/iInputManager';
+import { CandidateWindowStateBuilder, Composition, Candidate } from '../ui/candidateWindowState';
 
 
 const webworkerSrc : string = 'worker.js';
-
+const regexcomp = /{?[a-z,\,,_]*}?(.+)?=>(.*)/;
 
 export class YngPingWeb {
     
@@ -26,8 +28,20 @@ export class YngPingWeb {
         
         this.ready = true;
         console.log("ready");
-        this.candiadateWindow.activate();
         this.worker.onmessage = this.onWorkerMessage;
+        this.initKeys();
+        (this.candiadateWindow as IInputManager).registerInputFocusedListener(
+            ()=> {
+                this.capturingKeys = true;
+            }
+        );
+        (this.candiadateWindow as IInputManager).registerInputBlurredListener(
+            ()=> {
+                this.capturingKeys = false;
+            }
+        );
+        this.candiadateWindow.activate();
+
     }
 
     private initWebWorker() {
@@ -99,6 +113,25 @@ export class YngPingWeb {
         const data = message.data;
         if (data.type == CALLBACK) {
             // process and render
+            if (this.capturingKeys) {
+                const { payload } = data;
+                if (payload.type == "commit") {
+                    this.candiadateWindow.commitText(payload.text);
+                    this.candiadateWindow.hide();
+                } else if (payload.type == "composing") {
+                    const pageNo = payload.page_no;
+                    let highlightIndex = payload.index;
+                    const candidates : Array<string> = (payload.cand as Array<any>).map(item => item.text);
+                    highlightIndex %= candidates.length;
+                    let builder = new CandidateWindowStateBuilder()
+                        .setComposition(new Composition(payload.input, 0));
+                    for (let i = 0; i < candidates.length; ++i) {
+                        builder.addCandidate(new Candidate(candidates[i], ""));
+                    }
+                    builder.setHighLighted(highlightIndex);
+                    this.candiadateWindow.render(builder.build());
+                }
+            }
         }
     }
 

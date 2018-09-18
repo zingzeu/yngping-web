@@ -4,17 +4,9 @@ import {CALLBACK, LOADED, INITIALISED, ERROR, INITIALISING, LOADING, KEYPRESS} f
 
 declare var Module : any;
 const enc = new (TextEncoder as any)('UTF-8');
-const regexcomp = /{?[a-z,\,,_]*}?(.+)?=>(.*)/;
 
-let window :any = {};
 
-window.rime_callback = (something) => {
-    console.log("callback", something);
-    (postMessage as any)({
-        type: CALLBACK,
-        payload: JSON.parse(something)
-    });
-}
+
 try {
     (postMessage as any)({
         type: LOADING
@@ -35,12 +27,22 @@ try {
         (postMessage as any)({
             type: INITIALISED
         });
+        (self as any).window = {};
+
+        (self as any).window.rime_callback = (something) => {
+            console.log("callback", something);
+            (postMessage as any)({
+                type: CALLBACK,
+                payload: JSON.parse(something)
+            });
+        };
     },4000)
 
-} catch {
+} catch (e) {
+    console.error(e);
     (postMessage as any)({
         type: ERROR,
-        error: "failed to intialise librime."
+        error: "failed to intialise librime." + e
     });
 }
 

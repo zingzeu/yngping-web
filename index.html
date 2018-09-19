@@ -48,7 +48,7 @@
     <script type="text/javascript" src="static/keypress-2.1.5.min.js"></script>
     <script type="text/javascript" src="main.js"></script>
     <script>
-        if (!(Modernizr.webworkers && wasmSupported())) {
+        if (!(Modernizr.webworkers && wasmSupported() && typeof(TextEncoder) == 'function')) {
             document.querySelector("#overlay").style.display = 'block';
         }
         YngPing.init();

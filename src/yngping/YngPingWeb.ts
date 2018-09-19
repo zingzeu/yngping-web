@@ -1,7 +1,8 @@
-import {CandidateWindow} from '../ui';
-import { INITIALISED, ERROR, CALLBACK, KEYPRESS } from '../common/messageTypes';
+import { CandidateWindow, Toolbar } from '../ui';
+import { INITIALISED, ERROR, CALLBACK, KEYPRESS, INITIALISING } from '../common/messageTypes';
 import { IInputManager } from '../ui/iInputManager';
 import { CandidateWindowStateBuilder, Composition, Candidate } from '../ui/candidateWindowState';
+import { ToolbarState, ToolbarStateBuilder } from '../ui/toolbarState';
 
 
 const webworkerSrc : string = 'worker.js';
@@ -10,24 +11,48 @@ const regexcomp = /{?[a-z,\,,_]*}?(.+)?=>(.*)/;
 export class YngPingWeb {
     
     private candiadateWindow = new CandidateWindow();
+    private toolbar : Toolbar = new Toolbar();
     private worker : Worker;
     private ready: boolean = false;
     private capturingKeys: boolean = false;
+    private composing: boolean = false;
+    private lastInput: string = "";
 
+    private readonly toolbarStateDownloading : ToolbarState =
+    new ToolbarStateBuilder().addLoadingWidget().addTextWidget('词库下载中...').build();
+
+    private readonly toolbarStateInit : ToolbarState =
+        new ToolbarStateBuilder().addInitWidget().addTextWidget('初始化 rime 引擎...').build();
+
+    private readonly toolbarReady : ToolbarState =
+        new ToolbarStateBuilder().addTextWidget('榕拼输入法').build();
+
+    private readonly toolbarError : ToolbarState =
+        new ToolbarStateBuilder().addTextWidget('初始化失败').build();
+
+    /**
+     * Keypress.js listener.
+     */
+    private listener: any = new (window as any).keypress.Listener();
     constructor() {
-
+        this.toolbar.init();
     }
 
     public async init(): Promise<void> {
+        this.toolbar.show();
+        // init indicator
+        this.toolbar.render(this.toolbarStateDownloading);
         try {
             await this.initWebWorker();
         } catch (e) {
             console.log("Failed to init", e);
+            this.toolbar.render(this.toolbarError);
             return;
         }
         
         this.ready = true;
         console.log("ready");
+        this.toolbar.render(this.toolbarReady);
         this.worker.onmessage = this.onWorkerMessage;
         this.initKeys();
         (this.candiadateWindow as IInputManager).registerInputFocusedListener(
@@ -64,6 +89,9 @@ export class YngPingWeb {
 
     private statusUpdate(data) {
         console.log("Status:", data);
+        if (data.type == INITIALISING) {
+            this.toolbar.render(this.toolbarStateInit);
+        }
     }
 
     /**
@@ -75,12 +103,15 @@ export class YngPingWeb {
                 type: KEYPRESS,
                 key
             });
+            if (this.lastInput.length == 1 && key == "{BackSpace}") {
+                this.stopComposing();
+                this.candiadateWindow.hide();
+            }
         }
     }
 
-    private initKeys() {
-        const listener = new (window as any).keypress.Listener();
-        listener.simple_combo("ctrl `", () => this.keyin("{Control+grave}"));
+    private initSpecialKeys() {
+        const listener = this.listener;
         listener.simple_combo("space", () => this.keyin(" "))
         listener.simple_combo("backspace", () => this.keyin("{BackSpace}"));
         listener.simple_combo("enter", () => this.keyin("{Return}"));
@@ -94,8 +125,43 @@ export class YngPingWeb {
                 "keys": "down",
                 "on_keydown": () => this.keyin("{Down}"),
                 "prevent_default": true
+            },//@todo: next/prev pages
+            /*,
+            {
+                "keys": "left",
+                "on_keydown": () => this.keyin("{Left}"),
+                "prevent_default": true
             },
+            {
+                "keys": "right",
+                "on_keydown": () => this.keyin("{Right}"),
+                "prevent_default": true
+            }*/
         ]);
+    }
+
+    private uninitSpecialKeys() {
+        const listener = this.listener;
+        listener.unregister_combo("space", () => this.keyin(" "))
+        listener.unregister_combo("backspace", () => this.keyin("{BackSpace}"));
+        listener.unregister_combo("enter", () => this.keyin("{Return}"));
+        listener.unregister_many(["up", "down"]/*,
+            {
+                "keys": "left",
+                "on_keydown": () => this.keyin("{Left}"),
+                "prevent_default": true
+            },
+            {
+                "keys": "right",
+                "on_keydown": () => this.keyin("{Right}"),
+                "prevent_default": true
+            }*/
+        );
+    }
+
+    private initKeys() {
+        const listener = this.listener;
+        listener.simple_combo("ctrl `", () => this.keyin("{Control+grave}"));
         const letters = [];
         ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
@@ -107,6 +173,22 @@ export class YngPingWeb {
                 });
             })
         listener.register_many(letters);
+        //listener.initSpecialKeys();
+    }
+
+    private startComposing() {
+        if (this.composing == false) {
+            this.composing = true;
+            this.initSpecialKeys();
+        }
+    }
+
+    private stopComposing() {
+        if (this.composing == true) {
+            this.composing = false;
+            this.candiadateWindow.clear();
+            this.uninitSpecialKeys();
+        }
     }
 
     private onWorkerMessage = (message: MessageEvent) => {
@@ -118,8 +200,10 @@ export class YngPingWeb {
                 if (payload.type == "commit") {
                     this.candiadateWindow.commitText(payload.text);
                     this.candiadateWindow.hide();
+                    this.stopComposing();
                 } else if (payload.type == "composing") {
                     const pageNo = payload.page_no;
+                    this.lastInput = payload.input;
                     let highlightIndex = payload.index;
                     const candidates : Array<string> = (payload.cand as Array<any>).map(item => item.text);
                     highlightIndex %= candidates.length;
@@ -130,6 +214,7 @@ export class YngPingWeb {
                     }
                     builder.setHighLighted(highlightIndex);
                     this.candiadateWindow.render(builder.build());
+                    this.startComposing();
                 }
             }
         }

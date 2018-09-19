@@ -28,6 +28,7 @@ export class CandidateWindow implements IInputManager {
             } else {
                 input.value += text;
             }
+            this.clear();
             return true;
         } else {
             return false;
@@ -43,11 +44,12 @@ export class CandidateWindow implements IInputManager {
         this.element = document.createElement("div");
         this.element.style.cssText = `
             position: absolute;
-            border: 1px red #efefef;
+            border: 1px solid #efefef;
             min-width:100px; 
             z-index:1000; 
             min-height: 20px;
             background: #f9f9f9;
+            font-size: 16px;
             box-shadow: 0px 3px 9px 3px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
             padding: 5px;`;
         this.hide();
@@ -69,6 +71,10 @@ export class CandidateWindow implements IInputManager {
         }
     }
     
+    public clear() {
+        this.render(new CandidateWindowStateBuilder().setComposition(new Composition("",0)).build());
+    }
+
     public render(state: CandidateWindowState) {
         // remove all children
         this.element.innerHTML = '';

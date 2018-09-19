@@ -1,1 +1,2 @@
-export {CandidateWindow} from "./candidateWindow";
+export { CandidateWindow } from "./candidateWindow";
+export { Toolbar } from './toolbar';

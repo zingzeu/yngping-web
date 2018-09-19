@@ -17,12 +17,14 @@ export class CandidateWindow implements IInputManager {
     public commitText(text: string): boolean {
         if (this.capturingKeys) {
             const input = this.activeInputElement as HTMLInputElement;
-            if (input.selectionStart) {
+            if (input.selectionStart >= 0) {
                 var startPos = input.selectionStart;
                 var endPos = input.selectionEnd;
                 input.value = input.value.substring(0, startPos)
                     + text
                     + input.value.substring(endPos, input.value.length);
+                input.selectionStart = startPos + text.length; 
+                input.selectionEnd = startPos + text.length; 
             } else {
                 input.value += text;
             }
@@ -40,7 +42,7 @@ export class CandidateWindow implements IInputManager {
     constructor () {
         this.element = document.createElement("div");
         this.element.style.cssText = `
-            position: fixed;
+            position: absolute;
             border: 1px red #efefef;
             min-width:100px; 
             z-index:1000; 

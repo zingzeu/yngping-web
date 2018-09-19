@@ -45,7 +45,7 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
     output: {
       filename: '[name].js',
       sourceMapFilename: '[file].map',
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(__dirname, 'build'),
     },
     /*optimization: {
       splitChunks: {
@@ -53,7 +53,7 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
       }
     },*/
     plugins: [
-      new CleanWebpackPlugin(['dist'])
+      //new CleanWebpackPlugin(['build'])
     ]
   },
   modeConfig(mode)

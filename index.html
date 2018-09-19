@@ -1,17 +1,64 @@
 <html>
-<head>
 
-</head>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="static/tufte.css" />
+    <link rel="stylesheet" href="static/pandoc.css" />
+    <link rel="stylesheet" href="static/custom.css" />
+    <script>
+    /*! modernizr 3.6.0 (Custom Build) | MIT *
+    * https://modernizr.com/download/?-webworkers-setclasses !*/
+    !function(e,n,s){function o(e,n){return typeof e===n}function a(){var e,n,s,a,i,l,r;for(var c in f)if(f.hasOwnProperty(c)){if(e=[],n=f[c],n.name&&(e.push(n.name.toLowerCase()),n.options&&n.options.aliases&&n.options.aliases.length))for(s=0;s<n.options.aliases.length;s++)e.push(n.options.aliases[s].toLowerCase());for(a=o(n.fn,"function")?n.fn():n.fn,i=0;i<e.length;i++)l=e[i],r=l.split("."),1===r.length?Modernizr[r[0]]=a:(!Modernizr[r[0]]||Modernizr[r[0]]instanceof Boolean||(Modernizr[r[0]]=new Boolean(Modernizr[r[0]])),Modernizr[r[0]][r[1]]=a),t.push((a?"":"no-")+r.join("-"))}}function i(e){var n=r.className,s=Modernizr._config.classPrefix||"";if(c&&(n=n.baseVal),Modernizr._config.enableJSClass){var o=new RegExp("(^|\\s)"+s+"no-js(\\s|$)");n=n.replace(o,"$1"+s+"js$2")}Modernizr._config.enableClasses&&(n+=" "+s+e.join(" "+s),c?r.className.baseVal=n:r.className=n)}var t=[],f=[],l={_version:"3.6.0",_config:{classPrefix:"",enableClasses:!0,enableJSClass:!0,usePrefixes:!0},_q:[],on:function(e,n){var s=this;setTimeout(function(){n(s[e])},0)},addTest:function(e,n,s){f.push({name:e,fn:n,options:s})},addAsyncTest:function(e){f.push({name:null,fn:e})}},Modernizr=function(){};Modernizr.prototype=l,Modernizr=new Modernizr;var r=n.documentElement,c="svg"===r.nodeName.toLowerCase();Modernizr.addTest("webworkers","Worker"in e),a(),i(t),delete l.addTest,delete l.addAsyncTest;for(var u=0;u<Modernizr._q.length;u++)Modernizr._q[u]();e.Modernizr=Modernizr}(window,document);    
+    </script>
+    <script>
+        function wasmSupported () {
+            try {
+                if (typeof WebAssembly === "object"
+                    && typeof WebAssembly.instantiate === "function") {
+                    const module = new WebAssembly.Module(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
+                    if (module instanceof WebAssembly.Module)
+                        return new WebAssembly.Instance(module) instanceof WebAssembly.Instance;
+                }
+            } catch (e) {
+            }
+            return false;
+        };
+    </script>
+    </head>
 
 <body>
-    <h1>Test</h1>
-    <p>Paragraph</p>
-    <input type="text" />
-    <textarea></textarea>
-    <script type="text/javascript" src="keypress-2.1.5.min.js"></script>
+    <article id="container">
+        <h2>榕拼输入法网页版 (测试)
+            <a id="copyToClipboard" href="#"><span style="float: right"><small>复制到剪贴板</small></span></a>
+        </h2>
+        <div>
+            <textarea id="output" class="userText" placeholder="输入法载入完成后，在这里打字..."></textarea>
+        </div>
+    </article>
+
+    <div id="overlay" style="display:none; background: white; padding: 50px; z-index:5000; position: fixed; top:0px; left:0px; bottom:0px; right:0px;">
+        <h1>不支持的浏览器</h1>
+        <p>
+            榕拼输入法网页版需要使用最新的浏览器功能，你的浏览器缺少这些功能，因此不兼容。
+            请下载安装最新版本的 <a href="http://www.firefox.com.cn" target="_blank">火狐浏览器(Firefox)</a>
+            或 <a href="https://www.google.cn/chrome/">谷歌浏览器(Chrome)</a>。
+        </p>
+    </div>
+
+    <script type="text/javascript" src="static/keypress-2.1.5.min.js"></script>
     <script type="text/javascript" src="main.js"></script>
     <script>
+        if (!(Modernizr.webworkers && wasmSupported())) {
+            document.querySelector("#overlay").style.display = 'block';
+        }
         YngPing.init();
+
+        var text = document.querySelector("#output");
+        var copyBtn = document.querySelector("#copyToClipboard");
+        copyBtn.onclick = function () {
+            text.select();
+            document.execCommand('copy');
+        }
     </script>
 </body>
 

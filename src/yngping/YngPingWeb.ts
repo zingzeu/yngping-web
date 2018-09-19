@@ -55,6 +55,8 @@ export class YngPingWeb {
         
         this.ready = true;
         console.log("ready");
+    
+        if (document.activeElement) (document.activeElement as HTMLElement).blur();
         this.toolbar.render(this.toolbarReady);
         this.worker.onmessage = this.onWorkerMessage;
         this.initKeys();

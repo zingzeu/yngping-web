@@ -1,0 +1,35 @@
+textarea {
+    font-family: et-book, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+    font-size: 21px;
+    line-height: 30px;
+    width: 100%;
+    border:none;
+    background: white;
+}
+
+.userText {
+    height: 60vh;
+    min-width: 200px;
+    padding-bottom: 5px;
+}
+
+#copyToClipboard {
+    font-size: 80%;
+    color:gray;
+}
+#menu {
+    height: 500px;
+}
+
+input {
+    width: 100%;
+    border-bottom: 1px solid gray;
+    border-left:none;
+    border-right:none;
+    border-top:none;
+    font-family: et-book, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+    font-size:21px;
+    height:30px;
+    line-height: 30px;
+    padding-bottom: 5px;
+}

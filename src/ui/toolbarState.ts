@@ -44,13 +44,13 @@ export class TextWidget implements ToolbarWidget {
 
 export class LoadingWidget extends SvgWidget {
     constructor () {
-        super('tail-spin.svg', 5,5,20);
+        super('static/tail-spin.svg', 5,5,20);
     }
 }
 
 export class InitWidget extends SvgWidget {
     constructor () {
-        super('three-dots.svg', 12,5,20);
+        super('static/three-dots.svg', 12,5,20);
     }
 }
 

@@ -38,9 +38,6 @@ export class Toolbar {
             float:left;
         `;
         this.element.appendChild(this.dragHandle);
-        //this.addWidget(this.createSvgWidget('three-dots.svg', 12,5,20));
-        this.addWidget(this.createSvgWidget('tail-spin.svg', 5,5,20));
-        this.addWidget(this.createTextWidget('下载词库中...'));
     }
 
     private createSvgWidget(src: string, paddingTop:number, paddingLeft: number, imgWidth: number) : HTMLElement {
@@ -53,7 +50,7 @@ export class Toolbar {
             /*background: red;*/
         `;
         elem.innerHTML = `
-            <img alt="" src="${src}" style="margin-top: ${paddingTop}px; margin-left: ${paddingLeft}px;" width="${imgWidth}" />
+            <img alt="" src="${src}" style="width: ${imgWidth}px; margin-top: ${paddingTop}px; margin-left: ${paddingLeft}px;" width="${imgWidth}" />
         `
         return elem;
     }
@@ -101,7 +98,7 @@ export class Toolbar {
         if (!this.isShown) {
             this.element.style.display = 'block';
             this.element.style.top = `${window.innerHeight - this.element.clientHeight - 20}px`;
-            this.element.style.left = `${window.innerWidth - this.element.clientWidth - 20}px`;
+            this.element.style.left = `${window.innerWidth - this.element.clientWidth - 200}px`;
             this.reposition();
             this.dragHandle.onmousedown = this.dragMouseDown;
             this.isShown = true;

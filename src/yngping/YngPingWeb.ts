@@ -1,5 +1,5 @@
 import { CandidateWindow, Toolbar } from '../ui';
-import { INITIALISED, ERROR, CALLBACK, KEYPRESS, INITIALISING } from '../common/messageTypes';
+import { INITIALISED, ERROR, CALLBACK, KEYPRESS, INITIALISING, LOADING_LONG } from '../common/messageTypes';
 import { IInputManager } from '../ui/iInputManager';
 import { CandidateWindowStateBuilder, Composition, Candidate } from '../ui/candidateWindowState';
 import { ToolbarState, ToolbarStateBuilder } from '../ui/toolbarState';
@@ -19,7 +19,10 @@ export class YngPingWeb {
     private lastInput: string = "";
 
     private readonly toolbarStateDownloading : ToolbarState =
-    new ToolbarStateBuilder().addLoadingWidget().addTextWidget('词库下载中...').build();
+        new ToolbarStateBuilder().addLoadingWidget().addTextWidget('词库下载中...').build();
+
+    private readonly toolbarStateDownloadingLong : ToolbarState =
+        new ToolbarStateBuilder().addLoadingWidget().addTextWidget('还在下载中...').build();
 
     private readonly toolbarStateInit : ToolbarState =
         new ToolbarStateBuilder().addInitWidget().addTextWidget('初始化 rime 引擎...').build();
@@ -91,6 +94,8 @@ export class YngPingWeb {
         console.log("Status:", data);
         if (data.type == INITIALISING) {
             this.toolbar.render(this.toolbarStateInit);
+        } else if (data.type == LOADING_LONG) {
+            this.toolbar.render(this.toolbarStateDownloadingLong);
         }
     }
 

@@ -2,6 +2,12 @@
  * Loading the .wasm and .data from network.
  */
 export const LOADING = "LOADING";
+
+/**
+ * Still loading.
+ */
+export const LOADING_LONG = "LOADING_LONG";
+
 /**
  * Loaded from network.
  */

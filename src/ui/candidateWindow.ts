@@ -80,7 +80,7 @@ export class CandidateWindow implements IInputManager {
         this.element.innerHTML = '';
         this.element.appendChild(this.renderComposition(state.composition));
         for (let i = 0; i < state.candidateCount; ++i) {
-            this.element.appendChild(this.renderCandidate(state.candidates[i], state.isHighlighted(i)));
+            this.element.appendChild(this.renderCandidate(i+1, state.candidates[i], state.isHighlighted(i)));
         }
         this.show();
         this.updatePosition();
@@ -93,10 +93,10 @@ export class CandidateWindow implements IInputManager {
         return div;
     }
 
-    private renderCandidate(state: Candidate, isHighlighted: boolean = false): HTMLElement {
+    private renderCandidate(i: number, state: Candidate, isHighlighted: boolean = false): HTMLElement {
         const div = document.createElement("div");
         const commentText = state.comment && state.comment.length > 0 ? ` (${state.comment})` : '';
-        div.innerHTML = `${state.text}${commentText}`;
+        div.innerHTML = `${i}. ${state.text}${commentText}`;
         div.style.cssText = `
             font-size:16px;
             overflow: hidden;

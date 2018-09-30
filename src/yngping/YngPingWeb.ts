@@ -132,7 +132,17 @@ export class YngPingWeb {
                 "keys": "down",
                 "on_keydown": () => this.keyin("{Down}"),
                 "prevent_default": true
-            },//@todo: next/prev pages
+            },
+            {
+                "keys": "-",
+                "on_keydown": () => this.keyin("{minus}"),
+                "prevent_default": true
+            },
+            {
+                "keys": "=",
+                "on_keydown": () => this.keyin("{equal}"),
+                "prevent_default": true
+            }
             /*,
             {
                 "keys": "left",

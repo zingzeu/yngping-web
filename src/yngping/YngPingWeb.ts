@@ -212,12 +212,15 @@ export class YngPingWeb {
                     const pageNo = payload.page_no;
                     this.lastInput = payload.input;
                     let highlightIndex = payload.index;
-                    const candidates : Array<string> = (payload.cand as Array<any>).map(item => item.text);
+                    const candidates : Array<any> = (payload.cand as Array<any>).map(item => ({
+                        text: item.text,
+                        comment: item.comment || ""
+                    }));
                     highlightIndex %= candidates.length;
                     let builder = new CandidateWindowStateBuilder()
                         .setComposition(new Composition(payload.input, 0));
                     for (let i = 0; i < candidates.length; ++i) {
-                        builder.addCandidate(new Candidate(candidates[i], ""));
+                        builder.addCandidate(new Candidate(candidates[i].text, candidates[i].comment));
                     }
                     builder.setHighLighted(highlightIndex);
                     this.candiadateWindow.render(builder.build());

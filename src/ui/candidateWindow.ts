@@ -95,7 +95,7 @@ export class CandidateWindow implements IInputManager {
 
     private renderCandidate(i: number, state: Candidate, isHighlighted: boolean = false): HTMLElement {
         const div = document.createElement("div");
-        const commentText = state.comment && state.comment.length > 0 ? ` (${state.comment})` : '';
+        const commentText = state.comment && state.comment.length > 0 ? ` (${state.comment.trim()})` : '';
         div.innerHTML = `${i}. ${state.text}${commentText}`;
         div.style.cssText = `
             font-size:16px;

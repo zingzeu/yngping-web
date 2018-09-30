@@ -162,7 +162,7 @@ export class YngPingWeb {
         listener.unregister_combo("space", () => this.keyin(" "))
         listener.unregister_combo("backspace", () => this.keyin("{BackSpace}"));
         listener.unregister_combo("enter", () => this.keyin("{Return}"));
-        listener.unregister_many(["up", "down"]/*,
+        listener.unregister_many(["up", "down", "-", "="]/*,
             {
                 "keys": "left",
                 "on_keydown": () => this.keyin("{Left}"),
@@ -183,7 +183,7 @@ export class YngPingWeb {
         ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
             'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-            'u', 'v', 'w', 'x', 'y', 'z'].forEach((x) => {
+            'u', 'v', 'w', 'x', 'y', 'z', '`'].forEach((x) => {
                 letters.push({
                     "keys": x,
                     "on_keydown": () => this.keyin(x)

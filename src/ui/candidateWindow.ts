@@ -142,9 +142,13 @@ export class CandidateWindow implements IInputManager {
 
     private updatePosition() {
         const caret = getCaretCoordinates(this.activeInputElement, (this.activeInputElement as any).selectionEnd, {});
-        const desiredTop = this.activeInputElement.offsetTop + caret.top + (isNaN(caret.height) ? 0 : caret.height) + 20;
-        const desiredLeft = this.activeInputElement.offsetLeft + caret.left + 50;
+        let desiredTop = this.activeInputElement.offsetTop + caret.top + (isNaN(caret.height) ? 0 : caret.height) + 20;
+        let desiredLeft = this.activeInputElement.offsetLeft + caret.left + 50;
         console.log(desiredTop, desiredLeft);
+        // avoid rendering off-screen
+        const rect = this.element.getBoundingClientRect();
+        desiredTop = Math.min(window.innerHeight - 5 - rect.height, desiredTop);
+        desiredLeft = Math.min(window.innerWidth - 5 - rect.width, desiredLeft);
         this.element.style.top = `${desiredTop}px`;
         this.element.style.left = `${desiredLeft}px`;
     }

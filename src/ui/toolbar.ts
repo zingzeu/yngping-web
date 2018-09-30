@@ -27,6 +27,7 @@ export class Toolbar {
             -moz-user-select: none; /* Firefox */
                 -ms-user-select: none; /* Internet Explorer/Edge */
                     user-select: none;
+            white-space: nowrap;
         `;
         this.dragHandle = document.createElement('div');
         this.dragHandle.style.cssText = `

@@ -51,7 +51,8 @@ export class CandidateWindow implements IInputManager {
             background: #f9f9f9;
             font-size: 16px;
             box-shadow: 0px 3px 9px 3px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
-            padding: 5px;`;
+            padding: 5px;
+            white-space: nowrap;`;
         this.hide();
     }
 

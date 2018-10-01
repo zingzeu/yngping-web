@@ -96,14 +96,30 @@ export class CandidateWindow implements IInputManager {
 
     private renderCandidate(i: number, state: Candidate, isHighlighted: boolean = false): HTMLElement {
         const div = document.createElement("div");
-        const commentText = state.comment && state.comment.length > 0 ? ` (${state.comment.trim()})` : '';
-        div.innerHTML = `${i}. ${state.text}${commentText}`;
         div.style.cssText = `
             font-size:16px;
             overflow: hidden;
             ${isHighlighted && 'background: #e1eeef;'}
             border-radius: 2px;
-            padding-left: 2px;`;
+            padding-left: 2px;
+            line-height: 22px;
+        `;
+        const spanText = document.createElement("span");
+        spanText.innerText = `${i}. ${state.text}`;
+        spanText.style.cssText = `
+            font-family: "Microsoft YaHei", "微软雅黑", "MicrosoftJhengHei", "华文细黑", STHeiti, MingLiu, sans-serif;
+        `;
+        div.appendChild(spanText);
+
+        if (state.comment && state.comment.length > 0) {
+            const spanComment = document.createElement("span");
+            spanComment.innerText = ` (${state.comment.trim()})`;
+            spanComment.style.cssText = `
+                font-family: "Times New Roman";
+                color: #666;
+            `;
+            div.appendChild(spanComment);
+        } 
         return div;
     }
 

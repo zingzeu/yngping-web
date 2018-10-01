@@ -3,6 +3,7 @@ import { INITIALISED, ERROR, CALLBACK, KEYPRESS, INITIALISING, LOADING_LONG } fr
 import { IInputManager } from '../ui/iInputManager';
 import { CandidateWindowStateBuilder, Composition, Candidate } from '../ui/candidateWindowState';
 import { ToolbarState, ToolbarStateBuilder } from '../ui/toolbarState';
+import { parseRimeComposition } from './utils';
 
 
 const webworkerSrc : string = 'worker.js';
@@ -102,20 +103,54 @@ export class YngPingWeb {
     }
 
     /**
-     * Sends key (sequence) to librime.
+     * Sends key (sequence) to librime (buffered).
      */
     private keyin = (key: string) => {
         if (this.ready && this.capturingKeys) {
-            this.worker.postMessage({
-                type: KEYPRESS,
-                key
-            });
-            if (this.lastInput.length == 1 && key == "{BackSpace}") {
-                this.stopComposing();
-                this.candiadateWindow.hide();
+            if (! (key >= 'a' && key <= 'z')) {
+                this.sendKeyToLibrimeImmediately(key);
+            } else {
+                this.sendKeyToLibrimeBuffered(key);
             }
         }
     }
+
+    private keybuffers : Array<string> = [];
+    private sendKeysTimeout = null;
+
+    private sendKeyToLibrimeImmediately = (key: string) => {
+        if (this.sendKeysTimeout !== null) {
+            clearTimeout(this.sendKeysTimeout);
+            this.sendKeysTimeout = null;
+        }
+        if (this.keybuffers.length > 0) {
+            this.worker.postMessage({
+                type: KEYPRESS,
+                key: this.keybuffers.join("")
+            });
+            this.keybuffers = [];
+        }
+        this.worker.postMessage({
+            type: KEYPRESS,
+            key
+        });
+    }
+    
+    private sendKeyToLibrimeBuffered = (key: string) => {
+        if (this.sendKeysTimeout !== null) {
+            clearTimeout(this.sendKeysTimeout);
+            this.sendKeysTimeout = null;
+        }
+        this.keybuffers.push(key);
+        this.sendKeysTimeout = setTimeout(()=>{
+            this.worker.postMessage({
+                type: KEYPRESS,
+                key: this.keybuffers.join("")
+            });
+            this.keybuffers = [];
+        }, 100);
+        
+    } 
 
     private initSpecialKeys() {
         const listener = this.listener;
@@ -227,14 +262,24 @@ export class YngPingWeb {
                         comment: item.comment || ""
                     }));
                     highlightIndex %= candidates.length;
+                    let composition;
+                    try {
+                        composition = parseRimeComposition(payload.comp); 
+                    } catch (e) {
+                        console.error("Failed to parse composition", payload.comp);
+                        composition = new Composition(payload.input, 0);
+                    }
                     let builder = new CandidateWindowStateBuilder()
-                        .setComposition(new Composition(payload.input, 0));
+                        .setComposition(composition);
                     for (let i = 0; i < candidates.length; ++i) {
                         builder.addCandidate(new Candidate(candidates[i].text, candidates[i].comment));
                     }
                     builder.setHighLighted(highlightIndex);
                     this.candiadateWindow.render(builder.build());
                     this.startComposing();
+                } else if (payload.type == "not_composing") {
+                    this.stopComposing();
+                    this.candiadateWindow.hide();
                 }
             }
         }

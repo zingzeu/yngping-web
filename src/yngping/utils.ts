@@ -1,6 +1,6 @@
 import { Composition } from "../ui/candidateWindowState";
 
-const regex = /\{([a-z,]*)\}([a-z]*)(=>(.*))?/;
+const regex = /\{([a-z,_]*)\}([`a-z]*)(=>(.*))?/;
 
 export function parseRimeComposition(str: string): Composition {
     const tokens = str.split('|');

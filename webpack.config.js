@@ -53,7 +53,6 @@ module.exports = ({ mode, presets, ver } = { mode: "production", presets: [], ve
       }
     },*/
     plugins: [
-      //new CleanWebpackPlugin(['build'])
       new webpack.DefinePlugin({
         VERSION_SUFFIX: JSON.stringify(ver),
       })

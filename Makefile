@@ -1,3 +1,5 @@
+VERSION_SUFFIX = v5
+
 copy-assets:
 	mkdir -p build/ && \
 	cp index.html build/ && \
@@ -12,6 +14,9 @@ dev: copy-assets
 	npm run dev
 
 build : | clean copy-assets
-	npm run build
+	npm run build -- --env.ver=$(VERSION_SUFFIX) && \
+	sed -i '' -e 's/src="main.js"/src="main.js?$(VERSION_SUFFIX)"/' ./build/index.html && \
+	sed -i '' -e 's/rime_console.wasm/rime_console.wasm?$(VERSION_SUFFIX)/' ./build/rime_console.js && \
+	sed -i '' -e 's/rime_console.data/rime_console.data?$(VERSION_SUFFIX)/' ./build/rime_console.js
 
 .PHONY : build

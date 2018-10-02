@@ -3,13 +3,15 @@ declare var importScripts : any;
 import {CALLBACK, LOADED, INITIALISED, ERROR, INITIALISING, LOADING, KEYPRESS, LOADING_LONG} from '../common/messageTypes';
 
 declare var Module : any;
+declare var VERSION_SUFFIX: string;
+
 const enc = new (TextEncoder as any)('UTF-8');
 
 try {
     (postMessage as any)({
         type: LOADING
     });
-    importScripts("rime_console.js");
+    importScripts(`rime_console.js?${VERSION_SUFFIX}`);
     (postMessage as any)({
         type: LOADED
     });

@@ -5,8 +5,9 @@ import { CandidateWindowStateBuilder, Composition, Candidate } from '../ui/candi
 import { ToolbarState, ToolbarStateBuilder } from '../ui/toolbarState';
 import { parseRimeComposition } from './utils';
 
+declare var VERSION_SUFFIX: string;
 
-const webworkerSrc : string = 'worker.js';
+const webworkerSrc : string = `worker.js?${VERSION_SUFFIX}`;
 const regexcomp = /{?[a-z,\,,_]*}?(.+)?=>(.*)/;
 
 export class YngPingWeb {

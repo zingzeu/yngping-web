@@ -6,7 +6,7 @@ const webpackMerge = require("webpack-merge");
 
 const modeConfig = env => require(`./build-utils/webpack.${env}`)(env);
 
-module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
+module.exports = ({ mode, presets, ver } = { mode: "production", presets: [], ver: "" }) => {
   return webpackMerge({
     entry: {
       "main": './src/index.ts',
@@ -54,6 +54,9 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
     },*/
     plugins: [
       //new CleanWebpackPlugin(['build'])
+      new webpack.DefinePlugin({
+        VERSION_SUFFIX: JSON.stringify(ver),
+      })
     ]
   },
   modeConfig(mode)

@@ -113,7 +113,7 @@ export class CandidateWindow implements IInputManager {
 
         if (state.comment && state.comment.length > 0) {
             const spanComment = document.createElement("span");
-            spanComment.innerText = ` (${state.comment.trim()})`;
+            spanComment.innerText = ` ${state.comment.trim()}`;
             spanComment.style.cssText = `
                 font-family: "Times New Roman";
                 color: #666;

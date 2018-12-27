@@ -1,8 +1,9 @@
-VERSION_SUFFIX = v11
+VERSION_SUFFIX = v12
 
 copy-assets:
 	mkdir -p build/ && \
 	cp index.html build/ && \
+	cp robots.txt build/ && \
 	mkdir -p build/static && \
 	cp -rf static build/ && \
 	cp wasm/* build/

@@ -1,4 +1,4 @@
-VERSION_SUFFIX = v10
+VERSION_SUFFIX = v11
 
 copy-assets:
 	mkdir -p build/ && \

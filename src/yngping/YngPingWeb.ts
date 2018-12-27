@@ -30,7 +30,7 @@ export class YngPingWeb {
         new ToolbarStateBuilder().addInitWidget().addTextWidget('初始化 rime 引擎...').build();
 
     private readonly toolbarReady : ToolbarState =
-        new ToolbarStateBuilder().addTextWidget('榕拼输入法').build();
+        new ToolbarStateBuilder().addTextWidget('真鸟囝平话输入法').build();
 
     private readonly toolbarError : ToolbarState =
         new ToolbarStateBuilder().addTextWidget('初始化失败').build();
